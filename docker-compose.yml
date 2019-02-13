@@ -1,0 +1,58 @@
+version: '3.5'
+
+networks:
+  default:
+    name: trace_net
+    driver: bridge
+
+services:
+  hello:
+    hostname: hello_app
+    build:
+      context: .
+      dockerfile: ./hello/Dockerfile
+    command: ["ruby", "hello/hello.rb", "-p", "4567", "-o", "0.0.0.0"]
+    expose:
+      - "4567"
+    ports:
+      - "4567:4567"
+    networks:
+      - default
+    volumes:
+      - .:/hello
+    tty: true
+    stdin_open: true
+
+  hello_world:
+    hostname: hello_world_app
+    build:
+      context: .
+      dockerfile: ./hello_world/Dockerfile
+    command: ["ruby", "hello_world/hello_world.rb", "-p", "4570", "-o", "0.0.0.0"]
+    expose:
+      - "4570"
+    ports:
+      - "4570:4570"
+    networks:
+      - default
+    depends_on:
+      - hello
+    volumes:
+      - .:/hello_world
+    environment:
+      HELLO_APP: hello
+    tty: true
+    stdin_open: true
+
+  tracing:
+    hostname: tracing
+    image: "jaegertracing/all-in-one:latest"
+    networks:
+      - default
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+    expose:
+      - "16686"
+    ports:
+      - "16686:16686"
+      - "9411:9411"
