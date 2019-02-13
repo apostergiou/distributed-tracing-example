@@ -14,8 +14,11 @@ get '/' do
 end
 
 def hello
-  client = Net::HTTP.new('localhost', 4567)
-  req = Net::HTTP::Get.new('/')
-  OpenTracing.inject(env['rack.span'].context, OpenTracing::FORMAT_RACK, req)
-  client.request(req).body
+  uri = URI("http://#{ENV['HELLO_APP'] || 'localhost'}:4567")
+  Net::HTTP.start(uri.host, uri.port) do |http|
+    req = Net::HTTP::Get.new uri
+    OpenTracing.inject(env['rack.span'].context, OpenTracing::FORMAT_RACK, req)
+    resp = http.request req
+    resp.body
+  end
 end
