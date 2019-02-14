@@ -20,6 +20,8 @@ services:
       - default
     volumes:
       - .:/hello
+    environment:
+      TRACER_HOST: tracing
     tty: true
     stdin_open: true
 
@@ -40,7 +42,8 @@ services:
     volumes:
       - .:/hello_world
     environment:
-      HELLO_APP: hello
+      HELLO_HOST: hello
+      TRACER_HOST: tracing
     tty: true
     stdin_open: true
 
@@ -54,5 +57,5 @@ services:
     expose:
       - "16686"
     ports:
+      - "6831:6831/udp"
       - "16686:16686"
-      - "9411:9411"

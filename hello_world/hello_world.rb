@@ -5,7 +5,9 @@ require 'opentracing'
 require 'jaeger/client'
 require 'rack/tracer'
 
-OpenTracing.global_tracer = Jaeger::Client.build(service_name: 'hello-world')
+OpenTracing.global_tracer = Jaeger::Client.build(
+  host: ENV['TRACER_HOST'] || 'localhost',
+  service_name: 'hello-world')
 
 use Rack::Tracer
 
@@ -14,7 +16,7 @@ get '/' do
 end
 
 def hello
-  uri = URI("http://#{ENV['HELLO_APP'] || 'localhost'}:4567")
+  uri = URI("http://#{ENV['HELLO_HOST'] || 'localhost'}:4567")
   Net::HTTP.start(uri.host, uri.port) do |http|
     req = Net::HTTP::Get.new uri
     OpenTracing.inject(env['rack.span'].context, OpenTracing::FORMAT_RACK, req)
