@@ -13,7 +13,7 @@ $ make
 Send a request to `hello_world` service:
 
 ```shell
-$ curl curl http://localhost:4570
+$ curl http://localhost:4570
 ```
 
 Check the trace using the jaeger web UI:
